@@ -165,23 +165,44 @@ deleteButton.addEventListener('click', deleteFiles);
 
 
 // 파일 다운로드 버튼 클릭 이벤트
-downloadButton.addEventListener('click', () => {
+downloadButton.addEventListener('click', async () => {
   if (selectedFilesToDownload.size > 0) {
-    selectedFilesToDownload.forEach((itemRef) => {
-      itemRef.getDownloadURL().then((url) => {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = itemRef.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link); // 수정: setTimeout을 제거하고 바로 링크를 제거합니다.
+    if (selectedFilesToDownload.size > 1) {
+      const zip = new JSZip();
+
+      const downloadPromises = Array.from(selectedFilesToDownload).map(async (itemRef) => {
+        const url = await itemRef.getDownloadURL();
+        const response = await fetch(url, { mode: 'no-cors' });
+        const blob = await response.blob();
+        zip.file(itemRef.name, blob, { binary: true });
       });
-    });
+
+      await Promise.all(downloadPromises);
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const zipLink = document.createElement('a');
+      zipLink.href = URL.createObjectURL(zipBlob);
+      zipLink.download = 'files.zip';
+      zipLink.style.display = 'none';
+      document.body.appendChild(zipLink);
+      zipLink.click();
+      document.body.removeChild(zipLink);
+    } else {
+      const itemRef = Array.from(selectedFilesToDownload)[0];
+      const url = await itemRef.getDownloadURL();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = itemRef.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   } else {
     alert('다운로드할 파일을 선택해주세요.');
   }
 });
+
 
 
 listFiles();
