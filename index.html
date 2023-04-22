@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <title>파일이동 간소화</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<body>
+  <div><center><h2>파일이동 시간을 줄이려고 이렇게까지 해야하나?!<h2></center></div>
+  <div id="uploadArea" class="upload-area">
+    <h3>여기를 클릭하거나, 파일을 드래그 앤 드롭하세요.</h3>
+    <input type="file" id="fileInput" style="display:none;">
+    <p id="fileName"></p>
+  </div>
+  <button id="uploadButton">업로드</button>
+  <div class="uploading-file-name" id="uploadingFileName"></div>
+  <progress id="uploadProgress" value="0" max="100" style="width: 100%; display:none;"></progress>
+
+  <h3>다운로드할 파일 선택:</h3>
+    <ul id="fileListUl"></ul>
+  <button id="downloadButton" disabled>다운로드</button>
+  <button id="deleteButton" disabled>삭제</button>
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
