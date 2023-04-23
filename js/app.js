@@ -19,7 +19,9 @@ const downloadButton = document.getElementById('downloadButton');
 const uploadButton = document.getElementById('uploadButton');
 const uploadProgress = document.getElementById('uploadProgress');
 const deleteButton = document.getElementById('deleteButton');
+const selectAllButton = document.getElementById('selectAllButton');
 
+let selectAll = false;
 let filesToUpload = [];
 let selectedFilesToDownload = new Set();
 let selectedFile = null;
@@ -112,6 +114,30 @@ async function uploadFile(file) {
 
 
 
+// 추가: 전체 선택 버튼 클릭 이벤트
+selectAllButton.addEventListener('click', () => {
+  selectAll = !selectAll;
+  const allCheckboxes = fileListUl.getElementsByTagName('input');
+  for (const checkbox of allCheckboxes) {
+    updateCheckboxState(checkbox, selectAll);
+  }
+});
+
+
+// 체크박스 상태 업데이트 함수
+function updateCheckboxState(checkbox, isChecked) {
+  checkbox.checked = isChecked;
+  const itemRefName = checkbox.parentElement.querySelector('span').dataset.itemRefName; // 수정: itemRef.name을 가져옵니다.
+  if (isChecked) {
+    selectedFilesToDownload.add(itemRefName);
+  } else {
+    selectedFilesToDownload.delete(itemRefName);
+  }
+  downloadButton.disabled = deleteButton.disabled = selectedFilesToDownload.size === 0;
+}
+
+
+
 
 // 파일 목록 불러오기
 function listFiles() {
@@ -123,18 +149,14 @@ function listFiles() {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.addEventListener('change', () => {
-          if (checkbox.checked) {
-            selectedFilesToDownload.add(itemRef);
-          } else {
-            selectedFilesToDownload.delete(itemRef);
-          }
-          downloadButton.disabled = deleteButton.disabled = selectedFilesToDownload.size === 0;
+          updateCheckboxState(checkbox, checkbox.checked);
         });
 
         li.appendChild(checkbox);
         const fileNameSpan = document.createElement('span');
         fileNameSpan.textContent = itemRef.name;
         fileNameSpan.dataset.url = url;
+        fileNameSpan.dataset.itemRefName = itemRef.name; // 수정: itemRef.name을 저장합니다.
 
         li.appendChild(fileNameSpan);
         fileListUl.appendChild(li);
@@ -143,11 +165,15 @@ function listFiles() {
   });
 }
 
+
+
+
 // 파일 삭제 핸들러
 function deleteFiles() {
-  const promises = Array.from(selectedFilesToDownload).map((fileRef) => {
+  const promises = Array.from(selectedFilesToDownload).map((itemRefName) => {
+    const fileRef = storageRef.child(itemRefName);
     return fileRef.delete().then(() => {
-      console.log('파일 삭제 완료:', fileRef.name);
+      console.log('파일 삭제 완료:', itemRefName);
     }).catch((error) => {
       console.error('파일 삭제 오류:', error);
     });
@@ -155,10 +181,11 @@ function deleteFiles() {
 
   Promise.all(promises).then(() => {
     listFiles();
-    selectedFilesToDownload.clear(); // 추가: 선택된 파일을 비워줍니다.
-    downloadButton.disabled = deleteButton.disabled = true; // 추가: 다운로드 버튼과 삭제 버튼을 비활성화 합니다.
+    selectedFilesToDownload.clear();
+    downloadButton.disabled = deleteButton.disabled = true;
   });
 }
+
 
 deleteButton.addEventListener('click', deleteFiles);
 
@@ -170,11 +197,12 @@ downloadButton.addEventListener('click', async () => {
     if (selectedFilesToDownload.size > 1) {
       const zip = new JSZip();
 
-      const downloadPromises = Array.from(selectedFilesToDownload).map(async (itemRef) => {
-        const url = await itemRef.getDownloadURL();
+      const downloadPromises = Array.from(selectedFilesToDownload).map(async (itemRefName) => {
+        const fileRef = storageRef.child(itemRefName); // 수정: itemRefName을 사용하여 fileRef를 가져옵니다.
+        const url = await fileRef.getDownloadURL();
         const response = await fetch(url, { mode: 'no-cors' });
         const blob = await response.blob();
-        zip.file(itemRef.name, blob, { binary: true });
+        zip.file(itemRefName, blob, { binary: true });
       });
 
       await Promise.all(downloadPromises);
@@ -188,11 +216,12 @@ downloadButton.addEventListener('click', async () => {
       zipLink.click();
       document.body.removeChild(zipLink);
     } else {
-      const itemRef = Array.from(selectedFilesToDownload)[0];
-      const url = await itemRef.getDownloadURL();
+      const itemRefName = Array.from(selectedFilesToDownload)[0];
+      const fileRef = storageRef.child(itemRefName); // 수정: itemRefName을 사용하여 fileRef를 가져옵니다.
+      const url = await fileRef.getDownloadURL();
       const link = document.createElement('a');
       link.href = url;
-      link.download = itemRef.name;
+      link.download = itemRefName;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
