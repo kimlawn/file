@@ -28,6 +28,7 @@ let selectedFile = null;
 let selectedFilename = null;
 
 uploadButton.disabled = true;
+deleteButton.disabled = true;
 
 // 드래그 앤 드롭 이벤트 설정
 uploadArea.addEventListener('dragover', (e) => {
@@ -59,6 +60,9 @@ fileInput.addEventListener('change', () => {
     filesToUpload = filesToUpload.concat(Array.from(fileInput.files));
     updateSelectedFilesText();
     uploadButton.disabled = false;
+    deleteButton.disabled = false; // 추가: 파일이 선택되었을 때 삭제 버튼 활성화
+  } else {
+    deleteButton.disabled = true; // 추가: 파일이 선택되지 않았을 때 삭제 버튼 비활성화
   }
 });
 
@@ -127,13 +131,13 @@ selectAllButton.addEventListener('click', () => {
 // 체크박스 상태 업데이트 함수
 function updateCheckboxState(checkbox, isChecked) {
   checkbox.checked = isChecked;
-  const itemRefName = checkbox.parentElement.querySelector('span').dataset.itemRefName; // 수정: itemRef.name을 가져옵니다.
+  const itemRefName = checkbox.parentElement.querySelector('span').dataset.itemRefName;
   if (isChecked) {
     selectedFilesToDownload.add(itemRefName);
   } else {
     selectedFilesToDownload.delete(itemRefName);
   }
-  downloadButton.disabled = deleteButton.disabled = selectedFilesToDownload.size === 0;
+  downloadButton.disabled = deleteButton.disabled = selectedFilesToDownload.size === 0; // 수정: 선택된 파일이 없을 때 삭제 버튼을 비활성화
 }
 
 
@@ -182,7 +186,7 @@ function deleteFiles() {
   Promise.all(promises).then(() => {
     listFiles();
     selectedFilesToDownload.clear();
-    downloadButton.disabled = deleteButton.disabled = true;
+    downloadButton.disabled = deleteButton.disabled = true; // 수정: 파일 삭제 후 삭제 버튼을 비활성화
   });
 }
 
@@ -231,7 +235,5 @@ downloadButton.addEventListener('click', async () => {
     alert('다운로드할 파일을 선택해주세요.');
   }
 });
-
-
 
 listFiles();

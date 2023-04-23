@@ -148,3 +148,21 @@ li.selected {
 .upload-area:hover {
   background-color: #f5f5f5;
 }
+
+.select-all-button {
+    background-color: #007BFF;
+    color: white;
+}
+
+.select-all-button:hover:not(:disabled) {
+    background-color: #0069D9;
+}
+
+.delete-button {
+    background-color: #FF0000;
+    color: white;
+}
+
+.delete-button:hover:not(:disabled) {
+    background-color: #E00000;
+}
