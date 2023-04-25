@@ -194,46 +194,48 @@ function deleteFiles() {
 deleteButton.addEventListener('click', deleteFiles);
 
 
-
 // 파일 다운로드 버튼 클릭 이벤트
-downloadButton.addEventListener('click', async () => {
+downloadButton.addEventListener("click", async () => {
   if (selectedFilesToDownload.size > 0) {
     if (selectedFilesToDownload.size > 1) {
       const zip = new JSZip();
 
-      const downloadPromises = Array.from(selectedFilesToDownload).map(async (itemRefName) => {
-        const fileRef = storageRef.child(itemRefName); // 수정: itemRefName을 사용하여 fileRef를 가져옵니다.
-        const url = await fileRef.getDownloadURL();
-        const response = await fetch(url, { mode: 'no-cors' });
-        const blob = await response.blob();
-        zip.file(itemRefName, blob, { binary: true });
-      });
+      const downloadPromises = Array.from(selectedFilesToDownload).map(
+        async (itemRefName) => {
+          const fileRef = storageRef.child(itemRefName);
+          const url = await fileRef.getDownloadURL();
+          const response = await fetch(url);
+          const blob = await response.blob();
+          zip.file(itemRefName, blob, { binary: true });
+        }
+      );
 
       await Promise.all(downloadPromises);
 
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const zipLink = document.createElement('a');
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const zipLink = document.createElement("a");
       zipLink.href = URL.createObjectURL(zipBlob);
-      zipLink.download = 'files.zip';
-      zipLink.style.display = 'none';
+      zipLink.download = "files.zip";
+      zipLink.style.display = "none";
       document.body.appendChild(zipLink);
       zipLink.click();
       document.body.removeChild(zipLink);
     } else {
       const itemRefName = Array.from(selectedFilesToDownload)[0];
-      const fileRef = storageRef.child(itemRefName); // 수정: itemRefName을 사용하여 fileRef를 가져옵니다.
+      const fileRef = storageRef.child(itemRefName);
       const url = await fileRef.getDownloadURL();
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = itemRefName;
-      link.style.display = 'none';
+      link.style.display = "none";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   } else {
-    alert('다운로드할 파일을 선택해주세요.');
+    alert("다운로드할 파일을 선택해주세요.");
   }
 });
+
 
 listFiles();
