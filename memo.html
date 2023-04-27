@@ -2,6 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>메모 앱</title>
     <style>
         * {
@@ -44,7 +46,7 @@
             background-color: #4caf50;
             color: white;
         }
-        #delete-memo {
+        #delete-all-memos {
             background-color: #f44336;
             color: white;
         }
@@ -62,11 +64,20 @@
             font-size: 14px;
             padding: 4px 8px;
         }
-        #delete-all-memos {
-        background-color: #f44336;
-        color: white;
-    }
+
+        /* 반응형 디자인 미디어 쿼리 */
+        @media screen and (max-width: 600px) {
+            #memo-container {
+                margin: 20px 10px;
+                padding: 15px;
+            }
+            button {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+        }
     </style>
+
     <!-- Firebase App (필수) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <!-- Firestore (선택) -->
