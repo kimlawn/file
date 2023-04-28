@@ -90,9 +90,11 @@ button:disabled {
     cursor: not-allowed;
 }
 
-button:hover:not(:disabled) {
+/* 마우스 오버 했을 때 색이 변하도록 하는 부분
+
+  button:hover:not(:disabled) {
     background-color: #45a049;
-}
+} */
 
 .file-list {
     margin: 20px auto;
@@ -166,3 +168,13 @@ li.selected {
 .delete-button:hover:not(:disabled) {
     background-color: #E00000;
 }
+
+.move-to-memo-btn {
+            background-color: #0431B4; /* 원하는 배경색으로 변경 */
+            color: white;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
