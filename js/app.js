@@ -280,9 +280,11 @@ downloadButton.addEventListener("click", async () => {
 async function downloadFile(url) {
   const response = await axios.get(url, {
     responseType: 'blob',
-    onDownloadProgress: (progressEvent) => {
+    onDownloadProgress(progressEvent) {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      downloadProgress.value = percentCompleted; // 다운로드 진행상태 게이지 업데이트
+      if (progressEvent.loaded !== null) {
+        downloadProgress.value = percentCompleted;
+      }
     }
   });
 
