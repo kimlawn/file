@@ -88,7 +88,12 @@ uploadButton.addEventListener('click', async () => {
 // 파일 업로드 핸들러
 async function uploadFile(file) {
   const fileRef = storageRef.child(file.name);
-  const uploadTask = fileRef.put(file);
+  const metadata = {
+    customMetadata: {
+      'uploadedDate': new Date().toISOString()
+    }
+  }
+  const uploadTask = fileRef.put(file, metadata);
 
   // 업로드 중인 파일 이름 표시
   uploadingFileName.textContent = `업로드 중인 파일: ${file.name}`;
@@ -129,9 +134,8 @@ selectAllButton.addEventListener('click', () => {
 
 
 // 체크박스 상태 업데이트 함수
-function updateCheckboxState(checkbox, isChecked) {
+function updateCheckboxState(checkbox, itemRefName, isChecked) {
   checkbox.checked = isChecked;
-  const itemRefName = checkbox.parentElement.querySelector('span').dataset.itemRefName;
   if (isChecked) {
     selectedFilesToDownload.add(itemRefName);
   } else {
@@ -143,31 +147,65 @@ function updateCheckboxState(checkbox, isChecked) {
 
 
 
+
 // 파일 목록 불러오기
 function listFiles() {
   storageRef.listAll().then((res) => {
+    // Create table
+    const table = document.createElement('table');
     fileListUl.innerHTML = '';
-    res.items.forEach((itemRef) => {
-      itemRef.getDownloadURL().then((url) => {
-        const li = document.createElement('li');
+    const promises = res.items.map((itemRef) => {
+      return itemRef.getMetadata().then(metadata => {
+        return itemRef.getDownloadURL().then(url => {
+          return {metadata, url};
+        });
+      });
+    });
+
+    Promise.all(promises).then((files) => {
+      files.sort((a, b) => {
+        const aDate = a.metadata.customMetadata && a.metadata.customMetadata.uploadedDate ? new Date(a.metadata.customMetadata.uploadedDate) : new Date(0);
+        const bDate = b.metadata.customMetadata && b.metadata.customMetadata.uploadedDate ? new Date(b.metadata.customMetadata.uploadedDate) : new Date(0);
+        return bDate - aDate; // 업로드된 날짜 기준으로 내림차순 정렬
+      });
+
+      files.forEach((file) => {
+        const row = document.createElement('tr');
+        const checkboxCell = document.createElement('td');
+        const dateCell = document.createElement('td');
+        const nameCell = document.createElement('td');
+
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.addEventListener('change', () => {
-          updateCheckboxState(checkbox, checkbox.checked);
+          updateCheckboxState(checkbox, file.metadata.fullPath, checkbox.checked);
         });
 
-        li.appendChild(checkbox);
-        const fileNameSpan = document.createElement('span');
-        fileNameSpan.textContent = itemRef.name;
-        fileNameSpan.dataset.url = url;
-        fileNameSpan.dataset.itemRefName = itemRef.name; // 수정: itemRef.name을 저장합니다.
+        checkboxCell.appendChild(checkbox);
+        row.appendChild(checkboxCell);
 
-        li.appendChild(fileNameSpan);
-        fileListUl.appendChild(li);
+        const uploadedDate = file.metadata.customMetadata && file.metadata.customMetadata.uploadedDate ? new Date(file.metadata.customMetadata.uploadedDate).toLocaleString() : '업로드 날짜 정보 없음';
+        dateCell.textContent = uploadedDate;
+        row.appendChild(dateCell);
+
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.textContent = file.metadata.name;
+        fileNameSpan.dataset.url = file.url;
+        fileNameSpan.dataset.itemRefName = file.metadata.fullPath;
+        nameCell.appendChild(fileNameSpan);
+        row.appendChild(nameCell);
+
+        table.appendChild(row);
       });
+
+      fileListUl.appendChild(table);
     });
   });
 }
+
+
+
+
 
 
 
