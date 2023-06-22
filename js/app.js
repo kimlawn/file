@@ -128,7 +128,7 @@ selectAllButton.addEventListener('click', () => {
   selectAll = !selectAll;
   const allCheckboxes = fileListUl.getElementsByTagName('input');
   for (const checkbox of allCheckboxes) {
-    updateCheckboxState(checkbox, selectAll);
+    updateCheckboxState(checkbox, checkbox.parentElement.parentElement.children[2].firstChild.dataset.itemRefName, selectAll);
   }
 });
 
@@ -239,12 +239,12 @@ downloadButton.addEventListener("click", async () => {
       const zip = new JSZip();
 
       const downloadPromises = Array.from(selectedFilesToDownload).map(
-        async (itemRefName) => {
-          const fileRef = storageRef.child(itemRefName);
+        async (fullPath) => {
+          const fileRef = storageRef.child(fullPath);
           const url = await fileRef.getDownloadURL();
           const response = await fetch(url);
           const blob = await response.blob();
-          zip.file(itemRefName, blob, { binary: true });
+          zip.file(fullPath, blob, { binary: true });
         }
       );
 
@@ -259,12 +259,12 @@ downloadButton.addEventListener("click", async () => {
       zipLink.click();
       document.body.removeChild(zipLink);
     } else {
-      const itemRefName = Array.from(selectedFilesToDownload)[0];
-      const fileRef = storageRef.child(itemRefName);
+      const fullPath = Array.from(selectedFilesToDownload)[0];
+      const fileRef = storageRef.child(fullPath);
       const url = await fileRef.getDownloadURL();
       const link = document.createElement("a");
       link.href = url;
-      link.download = itemRefName;
+      link.download = encodeURIComponent(fullPath);  // 수정: 파일 이름을 안전하게 인코딩
       link.style.display = "none";
       document.body.appendChild(link);
       link.click();
@@ -274,6 +274,7 @@ downloadButton.addEventListener("click", async () => {
     alert("다운로드할 파일을 선택해주세요.");
   }
 });
+
 
 
 listFiles();
