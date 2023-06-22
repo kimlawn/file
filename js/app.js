@@ -243,7 +243,8 @@ downloadButton.addEventListener("click", async () => {
         async (fullPath) => {
           const fileRef = storageRef.child(fullPath);
           const url = await fileRef.getDownloadURL();
-          const blob = await downloadFile(url); // axios를 이용하여 파일 다운로드
+          const response = await fetch(url);
+          const blob = await response.blob();
           zip.file(fullPath, blob, { binary: true });
         }
       );
@@ -275,20 +276,6 @@ downloadButton.addEventListener("click", async () => {
   }
 });
 
-
-// 파일 다운로드 함수 (axios를 이용하여 다운로드 진행상태 확인 가능)
-async function downloadFile(url, onDownloadProgress) {
-  const response = await axios.get(url, {
-    responseType: 'blob',
-    onDownloadProgress(progressEvent) {
-      const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      downloadProgress.value = percentCompleted;
-    }
-  });
-
-  downloadProgress.value = 0; // 다운로드 진행상태 게이지 초기화
-  return response.data;
-}
 
 
 listFiles();
