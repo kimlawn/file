@@ -277,14 +277,12 @@ downloadButton.addEventListener("click", async () => {
 
 
 // 파일 다운로드 함수 (axios를 이용하여 다운로드 진행상태 확인 가능)
-async function downloadFile(url) {
+async function downloadFile(url, onDownloadProgress) {
   const response = await axios.get(url, {
     responseType: 'blob',
     onDownloadProgress(progressEvent) {
       const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      if (progressEvent.loaded !== null) {
-        downloadProgress.value = percentCompleted;
-      }
+      downloadProgress.value = percentCompleted;
     }
   });
 
