@@ -1,4 +1,4 @@
-const firebaseConfig = {
+/*const firebaseConfig = {
   apiKey: "AIzaSyABpvKxndo3pTqz2M9KRMmLT04QRE4fTcc",
   authDomain: "updown-e4a97.firebaseapp.com",
   projectId: "updown-e4a97",
@@ -7,6 +7,17 @@ const firebaseConfig = {
   appId: "1:187528912548:web:a9885e744fd65b821b9031",
   measurementId: "G-5BEK63C65L"
 };
+*/
+const firebaseConfig = {
+  apiKey: "AIzaSyD9phX0Uv6Irirno_u4AVlTQKZRBlmRweI",
+  authDomain: "updown-a07aa.firebaseapp.com",
+  projectId: "updown-a07aa",
+  storageBucket: "updown-a07aa.appspot.com",
+  messagingSenderId: "1063751665909",
+  appId: "1:1063751665909:web:43060ceae9437a705cddbc",
+  measurementId: "G-8R3PDBP0H6"
+};
+
 firebase.initializeApp(firebaseConfig);
 
 const storage = firebase.storage();
