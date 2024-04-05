@@ -1,11 +1,11 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyC_RtqD7l1FnvTePurj8fCw1JFdiYvKLtw",
-  authDomain: "file-845ba.firebaseapp.com",
-  projectId: "file-845ba",
-  storageBucket: "file-845ba.appspot.com",
-  messagingSenderId: "409740491467",
-  appId: "1:409740491467:web:45ddc8a7bd4a973c3a794e",
-  measurementId: "G-K8W9V51YRB"
+  apiKey: "AIzaSyBHZuaT0U84Uz3lK_cnvyLkg45rfsPRIfI",
+  authDomain: "file-95b13.firebaseapp.com",
+  projectId: "file-95b13",
+  storageBucket: "file-95b13.appspot.com",
+  messagingSenderId: "622102192686",
+  appId: "1:622102192686:web:50f9ee12d63441d954f5bf",
+  measurementId: "G-DMDN23WJLQ"
 };
 
 /*
